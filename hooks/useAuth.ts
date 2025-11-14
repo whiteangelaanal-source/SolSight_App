@@ -201,6 +201,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
     updateUser,
     connectWallet,
+    refreshUser,
   };
 
   return (
