@@ -29,11 +29,12 @@ export interface AuthState {
 }
 
 export interface AuthContextType extends AuthState {
-  login: (email: string, password: string, userType: 'blind' | 'volunteer') => Promise<void>;
-  signup: (userData: any, userType: 'blind' | 'volunteer') => Promise<void>;
-  logout: () => void;
-  updateUser: (updates: Partial<User>) => void;
-  connectWallet: (walletAddress: string) => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (userData: any) => Promise<void>;
+  logout: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  connectWallet: (walletAddress: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 // Create context
