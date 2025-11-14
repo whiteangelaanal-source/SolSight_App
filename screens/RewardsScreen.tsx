@@ -9,6 +9,7 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
+import { apiService } from '../services/api';
 
 interface Reward {
   id: string;
