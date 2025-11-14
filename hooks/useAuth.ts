@@ -127,7 +127,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiService.logout();
+    } catch (error) {
+      // Continue with logout even if API call fails
+      console.error('Logout API error:', error);
+    }
+
     setAuthState({
       user: null,
       isAuthenticated: false,
@@ -135,7 +142,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       userType: null,
     });
 
-    // In a real app, clear stored auth tokens
     console.log('User logged out');
   };
 
