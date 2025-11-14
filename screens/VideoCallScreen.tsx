@@ -64,15 +64,28 @@ const VideoCallScreen: React.FC<VideoCallScreenProps> = () => {
     try {
       AccessibilityInfo.announceForAvailabilityChange('Initializing video call...');
 
-      // Simulate WebRTC connection setup
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Get ICE servers for WebRTC connection
+      const iceResponse = await apiService.getICEServers();
+      const iceServers = iceResponse.data?.iceServers || [];
+
+      // Get room information for this session
+      const roomResponse = await apiService.getRoomInfo(sessionId);
+      const roomInfo = roomResponse.data;
+
+      if (!roomInfo) {
+        throw new Error('Invalid session ID');
+      }
 
       // In a real app, this would:
       // 1. Request camera and microphone permissions
-      // 2. Initialize WebRTC peer connection
-      // 3. Connect to signaling server
-      // 4. Exchange ICE candidates
-      // 5. Establish media streams
+      // 2. Initialize WebRTC peer connection with ICE servers
+      // 3. Connect to WebSocket signaling server
+      // 4. Join the room with sessionId
+      // 5. Exchange ICE candidates and SDP offers
+      // 6. Establish media streams
+
+      // For now, simulate the WebRTC connection setup
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       setIsConnected(true);
       AccessibilityInfo.announceForAvailabilityChange('Call connected successfully');
