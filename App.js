@@ -149,6 +149,11 @@ const AppContent = () => {
           <Stack.Screen name="BlindDashboard" component={BlindDashboard} />
           <Stack.Screen name="VideoCall" component={VideoCallScreen} />
         </Stack.Navigator>
+      ) : userType === 'admin' ? (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="AdminTabs" component={AdminTabs} />
+          <Stack.Screen name="VideoCall" component={VideoCallScreen} />
+        </Stack.Navigator>
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="VolunteerTabs" component={VolunteerTabs} />
