@@ -59,10 +59,16 @@ const VolunteerTabs = () => (
   </Tab.Navigator>
 );
 
-const App = () => {
-  // In a real app, you'd use authentication state to determine which stack to show
-  const isAuthenticated = false; // This will be managed by auth context
-  const userType = null; // This will be managed by auth context
+const AppContent = () => {
+  const { isAuthenticated, loading, userType } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1a2e' }}>
+        <ActivityIndicator size="large" color="#00d4ff" />
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>
@@ -80,6 +86,14 @@ const App = () => {
         </Stack.Navigator>
       )}
     </NavigationContainer>
+  );
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 
