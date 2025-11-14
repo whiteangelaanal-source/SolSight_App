@@ -2,6 +2,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, ActivityIndicator } from 'react-native';
+import { AuthProvider, useAuth } from './hooks/useAuth';
 import UserTypeScreen from './screens/UserTypeScreen';
 import LoginScreen from './screens/auth/LoginScreen';
 import SignupScreen from './screens/auth/SignupScreen';
