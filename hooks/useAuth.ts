@@ -1,17 +1,24 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
+import { apiService } from '../services/api';
 
 // Types
 export interface User {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   userType: 'blind' | 'volunteer';
   walletAddress?: string;
-  phoneVerified?: boolean;
-  emailVerified?: boolean;
+  phone?: string;
+  isVerified?: boolean;
+  reputationScore?: number;
+  totalCalls?: number;
+  totalHelpMinutes?: number;
+  averageRating?: number;
+  isAvailable?: boolean;
   createdAt: string;
-  profileCompleted?: boolean;
+  updatedAt?: string;
 }
 
 export interface AuthState {
