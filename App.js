@@ -12,6 +12,11 @@ import VolunteerDashboard from './screens/VolunteerDashboard';
 import VideoCallScreen from './screens/VideoCallScreen';
 import RewardsScreen from './screens/RewardsScreen';
 import LeaderboardScreen from './screens/LeaderboardScreen';
+import AdminDashboard from './screens/admin/AdminDashboard';
+import UserManagement from './screens/admin/UserManagement';
+import Analytics from './screens/admin/Analytics';
+import SystemStatus from './screens/admin/SystemStatus';
+import CallHistory from './screens/admin/CallHistory';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
