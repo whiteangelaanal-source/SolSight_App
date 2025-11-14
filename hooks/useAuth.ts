@@ -1,4 +1,5 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 
 // Types
 export interface User {
