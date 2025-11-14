@@ -56,20 +56,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const initializeAuth = async () => {
     try {
-      // In a real app, this would check for stored auth tokens
-      // and validate them with backend
-      console.log('Initializing authentication state...');
+      // Check for stored user data
+      const user = await apiService.getCurrentUser();
 
-      // Simulate auth check
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // For now, start with unauthenticated state
-      setAuthState({
-        user: null,
-        isAuthenticated: false,
-        loading: false,
-        userType: null,
-      });
+      if (user) {
+        setAuthState({
+          user,
+          isAuthenticated: true,
+          loading: false,
+          userType: user.userType,
+        });
+      } else {
+        setAuthState({
+          user: null,
+          isAuthenticated: false,
+          loading: false,
+          userType: null,
+        });
+      }
     } catch (error) {
       console.error('Auth initialization error:', error);
       setAuthState({
