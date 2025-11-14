@@ -1,1 +1,0 @@
-# SolSight_App
