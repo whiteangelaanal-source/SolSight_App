@@ -104,8 +104,17 @@ const VideoCallScreen: React.FC<VideoCallScreenProps> = () => {
     }
   };
 
-  const endCall = () => {
+  const endCall = async () => {
     setIsConnected(false);
+
+    try {
+      // Call API to end the call and record duration
+      if (sessionId) {
+        await apiService.endCall(sessionId, null, null, 'user_ended');
+      }
+    } catch (error) {
+      console.error('Error ending call:', error);
+    }
 
     // Clean up WebRTC resources
     if (localStream) {
