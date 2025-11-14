@@ -67,6 +67,7 @@ const registerRoutes = async () => {
           calls: '/api/calls',
           rewards: '/api/rewards',
           webrtc: '/api/webrtc',
+          admin: '/api/admin',
         },
         documentation: '/api/docs',
         websocket: '/api/webrtc/ws',
