@@ -64,18 +64,54 @@ const BlindDashboard = () => {
       // Announce request for accessibility
       AccessibilityInfo.announceForAccessibility('Requesting help from volunteers');
 
-      // Simulate matching with volunteer
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Simulate volunteer found
-      AccessibilityInfo.announceForAccessibility('Volunteer found, connecting to video call');
-
-      // Navigate to video call
-      navigation.navigate('VideoCall', {
-        isBlindUser: true,
-        sessionId: `session_${Date.now()}`,
-        volunteerName: 'Available Volunteer',
+      // Start matching process
+      const matchingResponse = await apiService.startMatching({
+        userType: 'blind',
+        preferences: {
+          language: user?.preferredLanguage || 'english',
+          location: user?.location,
+        },
       });
+
+      const { roomId, estimatedWaitTime } = matchingResponse.data;
+
+      // Wait for volunteer to accept (in production, this would use WebSocket)
+      let attempts = 0;
+      const maxAttempts = 30; // 30 seconds max wait
+
+      while (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        try {
+          const statusResponse = await apiService.getQueueStatus();
+          const queueData = statusResponse.data;
+
+          if (queueData.matchFound) {
+            AccessibilityInfo.announceForAccessibility('Volunteer found, connecting to video call');
+
+            // Navigate to video call with real session data
+            navigation.navigate('VideoCall', {
+              isBlindUser: true,
+              sessionId: roomId,
+              volunteerName: queueData.volunteerName,
+            });
+            return;
+          }
+        } catch (statusError) {
+          console.error('Error checking queue status:', statusError);
+        }
+
+        attempts++;
+      }
+
+      // If no volunteer found within timeout
+      AccessibilityInfo.announceForAccessibility('No volunteers available at the moment');
+
+      Alert.alert(
+        'No Volunteers Available',
+        'No volunteers are available right now. Please try again in a few minutes.',
+        [{ text: 'OK' }]
+      );
 
     } catch (error) {
       console.error('Error requesting help:', error);
