@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../hooks/useAuth';
+import { apiService } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
