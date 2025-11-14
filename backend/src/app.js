@@ -26,6 +26,7 @@ const matchingRoutes = require('./routes/matching');
 const callsRoutes = require('./routes/calls');
 const rewardsRoutes = require('./routes/rewards');
 const webrtcRoutes = require('./routes/webrtc');
+const adminRoutes = require('./routes/admin');
 
 // Route registration
 const registerRoutes = async () => {
@@ -51,6 +52,7 @@ const registerRoutes = async () => {
   await app.register(callsRoutes, { prefix: '/api/calls' });
   await app.register(rewardsRoutes, { prefix: '/api/rewards' });
   await app.register(webrtcRoutes, { prefix: '/api/webrtc' });
+  await app.register(adminRoutes, { prefix: '/api/admin' });
 
   // API documentation endpoint
   app.get('/api', async (request, reply) => {
@@ -65,6 +67,7 @@ const registerRoutes = async () => {
           calls: '/api/calls',
           rewards: '/api/rewards',
           webrtc: '/api/webrtc',
+          admin: '/api/admin',
         },
         documentation: '/api/docs',
         websocket: '/api/webrtc/ws',

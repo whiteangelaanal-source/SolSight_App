@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "temp_project",
-    "slug": "temp_project",
+    "name": "SolSight",
+    "slug": "solsight",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,17 +13,62 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.solsight.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSCameraUsageDescription": "SolSight uses camera for video calls to connect blind users with volunteers",
+        "NSMicrophoneUsageDescription": "SolSight uses microphone for audio during video calls"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.solsight.app",
+      "versionCode": "10000",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-av",
+      "@react-native-voice/voice"
+    ],
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "scripts/post-publish.js",
+          "config": {
+            "channel": "production"
+          }
+        }
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://api.solsight.app/updates",
+      "enabled": true,
+      "checkAutomatically": true,
+      "fallbackToCacheTimeout": 0
     }
   }
 }

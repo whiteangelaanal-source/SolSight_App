@@ -12,6 +12,11 @@ import VolunteerDashboard from './screens/VolunteerDashboard';
 import VideoCallScreen from './screens/VideoCallScreen';
 import RewardsScreen from './screens/RewardsScreen';
 import LeaderboardScreen from './screens/LeaderboardScreen';
+import AdminDashboard from './screens/admin/AdminDashboard';
+import UserManagement from './screens/admin/UserManagement';
+import Analytics from './screens/admin/Analytics';
+import SystemStatus from './screens/admin/SystemStatus';
+import CallHistory from './screens/admin/CallHistory';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -59,6 +64,71 @@ const VolunteerTabs = () => (
   </Tab.Navigator>
 );
 
+const AdminTabs = () => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: true,
+      tabBarStyle: {
+        backgroundColor: '#1a237e',
+        borderTopColor: '#333',
+      },
+      tabBarActiveTintColor: '#ffffff',
+      tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.7)',
+    }}
+  >
+    <Tab.Screen
+      name="AdminDashboard"
+      component={AdminDashboard}
+      options={{
+        title: 'Overview',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>📊</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="UserManagement"
+      component={UserManagement}
+      options={{
+        title: 'Users',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>👥</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="Analytics"
+      component={Analytics}
+      options={{
+        title: 'Analytics',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>📈</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="SystemStatus"
+      component={SystemStatus}
+      options={{
+        title: 'System',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>⚡</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="CallHistory"
+      component={CallHistory}
+      options={{
+        title: 'Calls',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>📞</Text>
+        )
+      }}
+    />
+  </Tab.Navigator>
+);
+
 const AppContent = () => {
   const { isAuthenticated, loading, userType } = useAuth();
 
@@ -77,6 +147,11 @@ const AppContent = () => {
       ) : userType === 'blind' ? (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="BlindDashboard" component={BlindDashboard} />
+          <Stack.Screen name="VideoCall" component={VideoCallScreen} />
+        </Stack.Navigator>
+      ) : userType === 'admin' ? (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="AdminTabs" component={AdminTabs} />
           <Stack.Screen name="VideoCall" component={VideoCallScreen} />
         </Stack.Navigator>
       ) : (

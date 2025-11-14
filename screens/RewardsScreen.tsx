@@ -9,6 +9,7 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
+import { apiService } from '../services/api';
 
 interface Reward {
   id: string;
@@ -43,56 +44,45 @@ const RewardsScreen = () => {
     try {
       setLoading(true);
 
-      // Simulate API calls
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Load rewards and blockchain info in parallel
+      const [rewardsResponse, blockchainResponse] = await Promise.all([
+        apiService.getUserRewards(50, 'all'), // Get up to 50 rewards
+        apiService.getBlockchainInfo(),
+      ]);
 
-      const mockRewards: Reward[] = [
-        {
-          id: '1',
-          amount: 0.1,
-          type: 'milestone',
-          description: 'First call completed',
-          timestamp: '2024-01-20T09:30:00Z',
-          transactionHash: 'abc123...',
-        },
-        {
-          id: '2',
-          amount: 0.5,
-          type: 'milestone',
-          description: '10 calls milestone',
-          timestamp: '2024-01-18T14:15:00Z',
-          transactionHash: 'def456...',
-        },
-        {
-          id: '3',
-          amount: 1.0,
-          type: 'airdrop',
-          description: 'NGO appreciation bonus',
-          timestamp: '2024-01-15T10:00:00Z',
-          transactionHash: 'ghi789...',
-        },
-        {
-          id: '4',
-          amount: 0.2,
-          type: 'bonus',
-          description: '5-star rating streak bonus',
-          timestamp: '2024-01-12T16:45:00Z',
-          transactionHash: 'jkl012...',
-        },
-      ];
+      const rewardsData = rewardsResponse.data?.rewards || [];
+      const blockchainData = blockchainResponse.data;
 
-      const totalEarned = mockRewards.reduce((sum, reward) => sum + reward.amount, 0);
+      // Transform rewards data to expected format
+      const transformedRewards: Reward[] = rewardsData.map((reward: any) => ({
+        id: reward.id,
+        amount: reward.amount,
+        type: reward.type,
+        description: reward.description,
+        timestamp: reward.createdAt,
+        transactionHash: reward.transactionHash,
+      }));
 
-      setRewards(mockRewards);
+      const totalEarned = transformedRewards.reduce((sum, reward) => sum + reward.amount, 0);
+
+      setRewards(transformedRewards);
       setWalletInfo({
-        address: walletAddress || '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        balance: 2.5,
+        address: walletAddress || '',
+        balance: blockchainData.balance || 0,
         totalEarned,
       });
 
     } catch (error) {
       console.error('Error loading rewards:', error);
       Alert.alert('Error', 'Failed to load rewards data');
+
+      // Set empty state on error
+      setRewards([]);
+      setWalletInfo({
+        address: walletAddress || '',
+        balance: 0,
+        totalEarned: 0,
+      });
     } finally {
       setLoading(false);
     }

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../hooks/useAuth';
+import { apiService } from '../services/api';
 
 interface IncomingCall {
   id: string;
@@ -67,36 +68,44 @@ const VolunteerDashboard = () => {
 
   const loadVolunteerData = async () => {
     try {
-      // Simulate API calls
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Load user stats including reputation data
+      const [statsResponse, rewardsResponse] = await Promise.all([
+        apiService.getUserStats(),
+        apiService.getUserRewards(3, 'all'), // Get last 3 rewards
+      ]);
 
+      const statsData = statsResponse.data;
+      const rewardsData = rewardsResponse.data?.rewards || [];
+
+      // Set reputation from user stats
       setReputation({
-        totalCalls: 42,
-        averageRating: 4.8,
-        reliabilityScore: 96,
-        lastUpdated: new Date().toISOString(),
+        totalCalls: statsData.totalCalls || 0,
+        averageRating: statsData.averageRating || 0,
+        reliabilityScore: statsData.reliabilityScore || 0,
+        lastUpdated: statsData.lastUpdated || new Date().toISOString(),
       });
 
-      const mockRewards: Reward[] = [
-        {
-          id: '1',
-          amount: 0.5,
-          type: 'milestone',
-          description: '50 calls milestone',
-          timestamp: '2024-01-15T10:00:00Z',
-        },
-        {
-          id: '2',
-          amount: 1.0,
-          type: 'airdrop',
-          description: 'NGO appreciation bonus',
-          timestamp: '2024-01-10T14:30:00Z',
-        },
-      ];
+      // Transform rewards data to expected format
+      const transformedRewards: Reward[] = rewardsData.map((reward: any) => ({
+        id: reward.id,
+        amount: reward.amount,
+        type: reward.type,
+        description: reward.description,
+        timestamp: reward.createdAt,
+      }));
 
-      setRecentRewards(mockRewards);
+      setRecentRewards(transformedRewards);
+
     } catch (error) {
       console.error('Error loading volunteer data:', error);
+      // Set default values on error
+      setReputation({
+        totalCalls: 0,
+        averageRating: 0,
+        reliabilityScore: 0,
+        lastUpdated: new Date().toISOString(),
+      });
+      setRecentRewards([]);
     }
   };
 
@@ -140,12 +149,27 @@ const VolunteerDashboard = () => {
     setIncomingCall(null);
   };
 
-  const handleOnlineToggle = (value: boolean) => {
-    setIsOnline(value);
+  const handleOnlineToggle = async (value: boolean) => {
+    try {
+      setIsOnline(value);
 
-    AccessibilityInfo.announceForAvailabilityChange(
-      value ? 'You are now online and available to help' : 'You are now offline'
-    );
+      // Update availability on backend
+      await apiService.updateAvailability(value);
+
+      AccessibilityInfo.announceForAvailabilityChange(
+        value ? 'You are now online and available to help' : 'You are now offline'
+      );
+    } catch (error) {
+      console.error('Error updating availability:', error);
+      // Revert state on error
+      setIsOnline(!value);
+
+      Alert.alert(
+        'Update Failed',
+        'Unable to update your availability status. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleLogout = () => {

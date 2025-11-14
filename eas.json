@@ -1,0 +1,70 @@
+{
+  "cli": {
+    "version": ">= 3.0.0"
+  },
+  "build": {
+    "development": {
+      "channel": "development",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "buildConfiguration": "Debug"
+      },
+      "env": {
+        "API_URL": "http://localhost:3000/api",
+        "SOLANA_NETWORK": "devnet",
+        "SENTRY_DSN": ""
+      }
+    },
+    "preview": {
+      "channel": "preview",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "buildConfiguration": "Release"
+      },
+      "env": {
+        "API_URL": "https://staging-api.solsight.app/api",
+        "SOLANA_NETWORK": "testnet",
+        "SENTRY_DSN": "https://your-sentry-dsn@sentry.io/project-id"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "distribution": "store",
+      "android": {
+        "buildType": "aab"
+      },
+      "ios": {
+        "buildConfiguration": "Release"
+      },
+      "env": {
+        "API_URL": "https://api.solsight.app/api",
+        "SOLANA_NETWORK": "mainnet-beta",
+        "SENTRY_DSN": "https://your-sentry-dsn@sentry.io/project-id"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-apple-app-id",
+        "ascAppId": "your-asc-app-id"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
+        "track": true
+      }
+    }
+  },
+  "hooks": {
+    "postBuild": {
+      "command": "./scripts/post-build.sh",
+      "file": "post-build-hook.log"
+    }
+  }
+}
