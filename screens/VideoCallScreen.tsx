@@ -21,6 +21,7 @@ interface VideoCallScreenProps {
 const VideoCallScreen: React.FC<VideoCallScreenProps> = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const { user } = useAuth();
   const { isBlindUser, sessionId, userName, volunteerName } = route.params || {};
 
   const [isConnected, setIsConnected] = useState(false);
