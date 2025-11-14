@@ -26,6 +26,7 @@ const matchingRoutes = require('./routes/matching');
 const callsRoutes = require('./routes/calls');
 const rewardsRoutes = require('./routes/rewards');
 const webrtcRoutes = require('./routes/webrtc');
+const adminRoutes = require('./routes/admin');
 
 // Route registration
 const registerRoutes = async () => {
