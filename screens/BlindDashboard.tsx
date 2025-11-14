@@ -34,29 +34,26 @@ const BlindDashboard = () => {
 
   const loadHelpHistory = async () => {
     try {
-      // Simulate loading help history
-      const mockHistory: HelpSession[] = [
-        {
-          id: '1',
-          volunteerName: 'Sarah Chen',
-          duration: 12,
-          rating: 5,
-          timestamp: '2024-01-15T10:30:00Z',
-        },
-        {
-          id: '2',
-          volunteerName: 'Mike Johnson',
-          duration: 8,
-          rating: 4,
-          timestamp: '2024-01-14T15:45:00Z',
-        },
-      ];
+      const response = await apiService.getCallHistory(20, 0, 'completed', 'blind');
+      const calls = response.data?.calls || [];
 
-      const mockRecent = mockHistory.slice(0, 3);
-      setRecentHelpers(mockRecent);
-      setHelpHistory(mockHistory);
+      // Transform call data to HelpSession format
+      const helpHistory: HelpSession[] = calls.map((call: any) => ({
+        id: call.id,
+        volunteerName: call.volunteerName || 'Anonymous Volunteer',
+        duration: Math.floor((call.endedAt - call.startedAt) / 60000), // Convert to minutes
+        rating: call.rating,
+        timestamp: call.startedAt,
+      }));
+
+      const recentHelpers = helpHistory.slice(0, 3);
+      setRecentHelpers(recentHelpers);
+      setHelpHistory(helpHistory);
     } catch (error) {
       console.error('Error loading help history:', error);
+      // Fallback to empty arrays if API fails
+      setRecentHelpers([]);
+      setHelpHistory([]);
     }
   };
 
