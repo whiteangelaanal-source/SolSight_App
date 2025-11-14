@@ -64,6 +64,71 @@ const VolunteerTabs = () => (
   </Tab.Navigator>
 );
 
+const AdminTabs = () => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: true,
+      tabBarStyle: {
+        backgroundColor: '#1a237e',
+        borderTopColor: '#333',
+      },
+      tabBarActiveTintColor: '#ffffff',
+      tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.7)',
+    }}
+  >
+    <Tab.Screen
+      name="AdminDashboard"
+      component={AdminDashboard}
+      options={{
+        title: 'Overview',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>📊</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="UserManagement"
+      component={UserManagement}
+      options={{
+        title: 'Users',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>👥</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="Analytics"
+      component={Analytics}
+      options={{
+        title: 'Analytics',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>📈</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="SystemStatus"
+      component={SystemStatus}
+      options={{
+        title: 'System',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>⚡</Text>
+        )
+      }}
+    />
+    <Tab.Screen
+      name="CallHistory"
+      component={CallHistory}
+      options={{
+        title: 'Calls',
+        tabBarIcon: ({ color, size }) => (
+          <Text style={{ fontSize: size, color }}>📞</Text>
+        )
+      }}
+    />
+  </Tab.Navigator>
+);
+
 const AppContent = () => {
   const { isAuthenticated, loading, userType } = useAuth();
 
