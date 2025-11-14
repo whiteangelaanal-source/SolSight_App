@@ -1,17 +1,24 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
+import { apiService } from '../services/api';
 
 // Types
 export interface User {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   userType: 'blind' | 'volunteer';
   walletAddress?: string;
-  phoneVerified?: boolean;
-  emailVerified?: boolean;
+  phone?: string;
+  isVerified?: boolean;
+  reputationScore?: number;
+  totalCalls?: number;
+  totalHelpMinutes?: number;
+  averageRating?: number;
+  isAvailable?: boolean;
   createdAt: string;
-  profileCompleted?: boolean;
+  updatedAt?: string;
 }
 
 export interface AuthState {
@@ -22,11 +29,12 @@ export interface AuthState {
 }
 
 export interface AuthContextType extends AuthState {
-  login: (email: string, password: string, userType: 'blind' | 'volunteer') => Promise<void>;
-  signup: (userData: any, userType: 'blind' | 'volunteer') => Promise<void>;
-  logout: () => void;
-  updateUser: (updates: Partial<User>) => void;
-  connectWallet: (walletAddress: string) => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (userData: any) => Promise<void>;
+  logout: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  connectWallet: (walletAddress: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 // Create context
@@ -48,20 +56,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const initializeAuth = async () => {
     try {
-      // In a real app, this would check for stored auth tokens
-      // and validate them with backend
-      console.log('Initializing authentication state...');
+      // Check for stored user data
+      const user = await apiService.getCurrentUser();
 
-      // Simulate auth check
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // For now, start with unauthenticated state
-      setAuthState({
-        user: null,
-        isAuthenticated: false,
-        loading: false,
-        userType: null,
-      });
+      if (user) {
+        setAuthState({
+          user,
+          isAuthenticated: true,
+          loading: false,
+          userType: user.userType,
+        });
+      } else {
+        setAuthState({
+          user: null,
+          isAuthenticated: false,
+          loading: false,
+          userType: null,
+        });
+      }
     } catch (error) {
       console.error('Auth initialization error:', error);
       setAuthState({
@@ -73,72 +85,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (email: string, password: string, userType: 'blind' | 'volunteer') => {
+  const login = async (email: string, password: string) => {
     setAuthState(prev => ({ ...prev, loading: true }));
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock user data
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
-        email,
-        name: email.split('@')[0], // Extract name from email for demo
-        userType,
-        emailVerified: true,
-        phoneVerified: userType === 'volunteer', // Volunteers need phone verification
-        createdAt: new Date().toISOString(),
-        profileCompleted: false,
-      };
+      const user = await apiService.login(email, password);
 
       setAuthState({
-        user: mockUser,
+        user,
         isAuthenticated: true,
         loading: false,
-        userType,
+        userType: user.userType,
       });
 
-      // In a real app, store auth tokens securely
-      console.log('User logged in:', mockUser);
+      console.log('User logged in:', user);
 
     } catch (error) {
       setAuthState(prev => ({ ...prev, loading: false }));
-      throw new Error('Login failed. Please check your credentials and try again.');
+      throw error;
     }
   };
 
-  const signup = async (userData: any, userType: 'blind' | 'volunteer') => {
+  const signup = async (userData: any) => {
     setAuthState(prev => ({ ...prev, loading: true }));
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const user = await apiService.register(userData);
 
-      // Mock user creation
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
-        email: userData.email,
-        name: userData.name,
-        userType,
-        emailVerified: false, // Need to verify email
-        phoneVerified: false,
-        createdAt: new Date().toISOString(),
-        profileCompleted: false,
-      };
+      setAuthState({
+        user,
+        isAuthenticated: true,
+        loading: false,
+        userType: user.userType,
+      });
 
-      // In a real app, this would create user in database
-      console.log('User created:', mockUser);
-
-      setAuthState(prev => ({ ...prev, loading: false }));
+      console.log('User created:', user);
 
     } catch (error) {
       setAuthState(prev => ({ ...prev, loading: false }));
-      throw new Error('Account creation failed. Please try again.');
+      throw error;
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiService.logout();
+    } catch (error) {
+      // Continue with logout even if API call fails
+      console.error('Logout API error:', error);
+    }
+
     setAuthState({
       user: null,
       isAuthenticated: false,
@@ -146,19 +142,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       userType: null,
     });
 
-    // In a real app, clear stored auth tokens
     console.log('User logged out');
   };
 
-  const updateUser = (updates: Partial<User>) => {
-    setAuthState(prev => ({
-      ...prev,
-      user: prev.user ? { ...prev.user, ...updates } : null,
-    }));
+  const updateUser = async (updates: Partial<User>) => {
+    try {
+      const updatedUser = await apiService.updateProfile(updates);
+
+      setAuthState(prev => ({
+        ...prev,
+        user: updatedUser,
+      }));
+    } catch (error) {
+      console.error('Update user error:', error);
+      throw error;
+    }
   };
 
-  const connectWallet = (walletAddress: string) => {
-    updateUser({ walletAddress });
+  const connectWallet = async (walletAddress: string) => {
+    try {
+      await apiService.setWalletAddress(walletAddress);
+
+      // Update local state
+      if (authState.user) {
+        setAuthState(prev => ({
+          ...prev,
+          user: { ...prev.user, walletAddress },
+        }));
+      }
+    } catch (error) {
+      console.error('Connect wallet error:', error);
+      throw error;
+    }
+  };
+
+  const refreshUser = async () => {
+    try {
+      const user = await apiService.getCurrentUser();
+
+      if (user) {
+        setAuthState(prev => ({
+          ...prev,
+          user,
+          isAuthenticated: true,
+          userType: user.userType,
+        }));
+      }
+    } catch (error) {
+      console.error('Refresh user error:', error);
+      // Don't throw error, just log it
+    }
   };
 
   const contextValue: AuthContextType = {
@@ -168,6 +201,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
     updateUser,
     connectWallet,
+    refreshUser,
   };
 
   return (
