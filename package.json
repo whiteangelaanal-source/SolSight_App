@@ -32,5 +32,8 @@
     "react-native-screens": "^4.18.0",
     "react-native-webrtc": "^124.0.7"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/react-navigation": "^3.0.8"
+  }
 }
