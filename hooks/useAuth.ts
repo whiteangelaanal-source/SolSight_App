@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 
 // Types
 export interface User {
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const initializeAuth = async () => {
     try {
       // In a real app, this would check for stored auth tokens
-      // and validate them with the backend
+      // and validate them with backend
       console.log('Initializing authentication state...');
 
       // Simulate auth check
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         profileCompleted: false,
       };
 
-      // In a real app, this would create the user in the database
+      // In a real app, this would create user in database
       console.log('User created:', mockUser);
 
       setAuthState(prev => ({ ...prev, loading: false }));
