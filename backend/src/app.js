@@ -52,6 +52,7 @@ const registerRoutes = async () => {
   await app.register(callsRoutes, { prefix: '/api/calls' });
   await app.register(rewardsRoutes, { prefix: '/api/rewards' });
   await app.register(webrtcRoutes, { prefix: '/api/webrtc' });
+  await app.register(adminRoutes, { prefix: '/api/admin' });
 
   // API documentation endpoint
   app.get('/api', async (request, reply) => {
