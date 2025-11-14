@@ -145,15 +145,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log('User logged out');
   };
 
-  const updateUser = (updates: Partial<User>) => {
-    setAuthState(prev => ({
-      ...prev,
-      user: prev.user ? { ...prev.user, ...updates } : null,
-    }));
+  const updateUser = async (updates: Partial<User>) => {
+    try {
+      const updatedUser = await apiService.updateProfile(updates);
+
+      setAuthState(prev => ({
+        ...prev,
+        user: updatedUser,
+      }));
+    } catch (error) {
+      console.error('Update user error:', error);
+      throw error;
+    }
   };
 
-  const connectWallet = (walletAddress: string) => {
-    updateUser({ walletAddress });
+  const connectWallet = async (walletAddress: string) => {
+    try {
+      await apiService.setWalletAddress(walletAddress);
+
+      // Update local state
+      if (authState.user) {
+        setAuthState(prev => ({
+          ...prev,
+          user: { ...prev.user, walletAddress },
+        }));
+      }
+    } catch (error) {
+      console.error('Connect wallet error:', error);
+      throw error;
+    }
+  };
+
+  const refreshUser = async () => {
+    try {
+      const user = await apiService.getCurrentUser();
+
+      if (user) {
+        setAuthState(prev => ({
+          ...prev,
+          user,
+          isAuthenticated: true,
+          userType: user.userType,
+        }));
+      }
+    } catch (error) {
+      console.error('Refresh user error:', error);
+      // Don't throw error, just log it
+    }
   };
 
   const contextValue: AuthContextType = {
