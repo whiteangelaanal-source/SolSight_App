@@ -106,33 +106,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signup = async (userData: any, userType: 'blind' | 'volunteer') => {
+  const signup = async (userData: any) => {
     setAuthState(prev => ({ ...prev, loading: true }));
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const user = await apiService.register(userData);
 
-      // Mock user creation
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
-        email: userData.email,
-        name: userData.name,
-        userType,
-        emailVerified: false, // Need to verify email
-        phoneVerified: false,
-        createdAt: new Date().toISOString(),
-        profileCompleted: false,
-      };
+      setAuthState({
+        user,
+        isAuthenticated: true,
+        loading: false,
+        userType: user.userType,
+      });
 
-      // In a real app, this would create user in database
-      console.log('User created:', mockUser);
-
-      setAuthState(prev => ({ ...prev, loading: false }));
+      console.log('User created:', user);
 
     } catch (error) {
       setAuthState(prev => ({ ...prev, loading: false }));
-      throw new Error('Account creation failed. Please try again.');
+      throw error;
     }
   };
 
