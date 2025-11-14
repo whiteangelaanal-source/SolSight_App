@@ -149,12 +149,27 @@ const VolunteerDashboard = () => {
     setIncomingCall(null);
   };
 
-  const handleOnlineToggle = (value: boolean) => {
-    setIsOnline(value);
+  const handleOnlineToggle = async (value: boolean) => {
+    try {
+      setIsOnline(value);
 
-    AccessibilityInfo.announceForAvailabilityChange(
-      value ? 'You are now online and available to help' : 'You are now offline'
-    );
+      // Update availability on backend
+      await apiService.updateAvailability(value);
+
+      AccessibilityInfo.announceForAvailabilityChange(
+        value ? 'You are now online and available to help' : 'You are now offline'
+      );
+    } catch (error) {
+      console.error('Error updating availability:', error);
+      // Revert state on error
+      setIsOnline(!value);
+
+      Alert.alert(
+        'Update Failed',
+        'Unable to update your availability status. Please try again.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleLogout = () => {
