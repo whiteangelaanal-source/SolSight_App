@@ -85,38 +85,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (email: string, password: string, userType: 'blind' | 'volunteer') => {
+  const login = async (email: string, password: string) => {
     setAuthState(prev => ({ ...prev, loading: true }));
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock user data
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
-        email,
-        name: email.split('@')[0], // Extract name from email for demo
-        userType,
-        emailVerified: true,
-        phoneVerified: userType === 'volunteer', // Volunteers need phone verification
-        createdAt: new Date().toISOString(),
-        profileCompleted: false,
-      };
+      const user = await apiService.login(email, password);
 
       setAuthState({
-        user: mockUser,
+        user,
         isAuthenticated: true,
         loading: false,
-        userType,
+        userType: user.userType,
       });
 
-      // In a real app, store auth tokens securely
-      console.log('User logged in:', mockUser);
+      console.log('User logged in:', user);
 
     } catch (error) {
       setAuthState(prev => ({ ...prev, loading: false }));
-      throw new Error('Login failed. Please check your credentials and try again.');
+      throw error;
     }
   };
 
